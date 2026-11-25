@@ -32,7 +32,7 @@ flowchart TB
     subgraph Compute_Hosts ["End Hosts / Clients"]
         direction LR
         C1["<b>client1 (VLAN 20)</b><br/>eth1.20: 192.168.20.11/26<br/>eth2.20: 192.168.20.12/26"]
-        C2["<b>client2 (VLAN 30)</b><br/>eth.30: 192.168.30.21/26"]
+        C2["<b>client2 (VLAN 30)</b><br/>eth1.30: 192.168.30.21/26<br/>eth2.30: 192.168.30.22/26"]
     end
 
     %% Uplink Connections (eBGP)
@@ -44,7 +44,8 @@ flowchart TB
     %% Downlink to Clients
     SRL1 ---|"e1/1.20<br/>VLAN 20"| C1
     SRL2 -.-|"e1/1.20 (Down)<br/>VLAN 20"| C1
-    SRL2 ---|"e1/2.30<br/>VLAN 30"| C2
+    SRL1 ---|"e1/2.30<br/>VLAN 30"| C2
+    SRL2 -.-|"e1/2.30 (Down)<br/>VLAN 30"| C2
 
     %% Styling
     classDef router fill:#1e293b,stroke:#38bdf8,stroke-width:2px,color:#f8fafc;
@@ -54,6 +55,7 @@ flowchart TB
     class FRR1,FRR2 router;
     class SRL1,SRL2 switch;
     class C1,C2 host;
+
 ```
 
 ---
