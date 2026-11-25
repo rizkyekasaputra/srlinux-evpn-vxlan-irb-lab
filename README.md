@@ -1,6 +1,3 @@
-# srlinux-evpn-vxlan-irb-lab
-EVPN-VXLAN Symmetric IRB lab using Nokia SR Linux 23.10, FRR, and Linux hosts on Clabernetes (Containerlab).
-
 # Nokia SR Linux EVPN-VXLAN Symmetric IRB Lab
 
 This repository contains the topology, configurations, and verification steps for a **Direct ToR-to-ToR EVPN-VXLAN Symmetric IRB** fabric built using **Nokia SR Linux 23.10**, **FRRouting (FRR)**, and Linux hosts running on **Clabernetes (Containerlab on Kubernetes)**.
