@@ -66,8 +66,8 @@ flowchart TB
 
 | Device | Role | BGP ASN | Loopback (`system0.0`) | Interface | IP Address | Connected To |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| **`srl1`** | ToR Switch 1 | `65001` | `10.100.0.1/32` | `ethernet-1/49.0`<br>`ethernet-1/50.0`<br>`ethernet-1/51.0`<br>`ethernet-1/1.20`<br>`ethernet-1/2.30` | `10.100.1.0/31`<br>`10.100.1.2/31`<br>`10.100.1.6/31`<br>Bridged (VLAN 20)<br>Bridged (VLAN 30) | `srl2` (`e1/49`)<br>`frr1`<br>`frr2`<br>`client1` (`eth1.20`)<br>VLAN 30 Segment |
-| **`srl2`** | ToR Switch 2 | `65001` | `10.100.0.2/32` | `ethernet-1/49.0`<br>`ethernet-1/50.0`<br>`ethernet-1/51.0`<br>`ethernet-1/1.20`<br>`ethernet-1/2.30` | `10.100.1.1/31`<br>`10.100.1.4/31`<br>`10.100.1.8/31`<br>Bridged (VLAN 20)<br>Bridged (VLAN 30) | `srl1` (`e1/49`)<br>`frr1`<br>`frr2`<br>`client1` (`eth2.20`)<br>`client2` (VLAN 30) |
+| **`srl1`** | ToR Switch 1 | `65001` | `10.100.0.1/32` | `ethernet-1/49.0`<br>`ethernet-1/50.0`<br>`ethernet-1/51.0`<br>`ethernet-1/1.20`<br>`ethernet-1/2.30` | `10.100.1.0/31`<br>`10.100.1.2/31`<br>`10.100.1.6/31`<br>Bridged (VLAN 20)<br>Bridged (VLAN 30) | `srl2` (`e1/49`)<br>`frr1`<br>`frr2`<br>`client1` (`eth1.20`)<br>`client2` (`eth1.30`) |
+| **`srl2`** | ToR Switch 2 | `65001` | `10.100.0.2/32` | `ethernet-1/49.0`<br>`ethernet-1/50.0`<br>`ethernet-1/51.0`<br>`ethernet-1/1.20`<br>`ethernet-1/2.30` | `10.100.1.1/31`<br>`10.100.1.4/31`<br>`10.100.1.8/31`<br>Bridged (VLAN 20)<br>Bridged (VLAN 30) | `srl1` (`e1/49`)<br>`frr1`<br>`frr2`<br>`client1` (`eth2.20`)<br>`client2` (`eth2.30`) |
 | **`frr1`** | External Router 1 | `65011` | - | `eth1`<br>`eth2` | `10.100.1.3/31`<br>`10.100.1.5/31` | `srl1` (`e1/50`)<br>`srl2` (`e1/50`) |
 | **`frr2`** | External Router 2 | `65012` | - | `eth1`<br>`eth2` | `10.100.1.7/31`<br>`10.100.1.9/31` | `srl1` (`e1/51`)<br>`srl2` (`e1/51`) |
 
@@ -76,8 +76,9 @@ flowchart TB
 | Service / VRF | Type | EVI / VNI | Route Target (`export`/`import`) | Anycast Gateway (`irb0`) | Host / Client IP |
 | :--- | :--- | :--- | :--- | :--- | :--- |
 | **`mac-vrf-x`** | `mac-vrf` (L2) | `20` | `target:65001:20` | `irb0.1`: `192.168.20.1/26`<br>(`virtual-router-id 1`) | **`client1`**:<br>• `eth1.20`: `192.168.20.11/26`<br>• `eth2.20`: `192.168.20.12/26` |
-| **`mac-vrf-y`** | `mac-vrf` (L2) | `30` | `target:65001:30` | `irb0.2`: `192.168.30.1/26`<br>(`virtual-router-id 2`) | **`client2`**:<br>• `eth.30`: `192.168.30.21/26` |
+| **`mac-vrf-y`** | `mac-vrf` (L2) | `30` | `target:65001:30` | `irb0.2`: `192.168.30.1/26`<br>(`virtual-router-id 2`) | **`client2`**:<br>• `eth1.30`: `192.168.30.21/26`<br>• `eth2.30`: `192.168.30.22/26` |
 | **`ip-vrf-red`** | `ip-vrf` (L3) | `1001` | `target:65001:1001` | Binds `irb0.1` & `irb0.2` | Inter-VLAN Routing |
+
 
 ---
 
