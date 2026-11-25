@@ -15,18 +15,22 @@ This repository contains the topology, configurations, and verification steps fo
 ## Network Topology
 
 ```mermaid
-graph TD
+flowchart TB
     subgraph External_Routers ["External / Uplink Routers (Underlay)"]
+        direction LR
         FRR1["<b>frr1</b><br/>AS 65011"]
         FRR2["<b>frr2</b><br/>AS 65012"]
     end
 
     subgraph ToR_Fabric ["Nokia SR Linux EVPN-VXLAN Fabric (AS 65001)"]
+        direction LR
         SRL1["<b>srl1 (ToR-1)</b><br/>system0: 10.100.0.1/32<br/>Anycast GW: 192.168.20.1 & 30.1"]
         SRL2["<b>srl2 (ToR-2)</b><br/>system0: 10.100.0.2/32<br/>Anycast GW: 192.168.20.1 & 30.1"]
+        SRL1 <==>|"<b>e1/49: 10.100.1.0/31 ↔ .1/31</b><br/>iBGP TOR-EVPN & VXLAN Tunnel<br/>(VNI 20, 30, 1001)"| SRL2
     end
 
     subgraph Compute_Hosts ["End Hosts / Clients"]
+        direction LR
         C1["<b>client1 (VLAN 20)</b><br/>eth1.20: 192.168.20.11/26<br/>eth2.20: 192.168.20.12/26"]
         C2["<b>client2 (VLAN 30)</b><br/>eth.30: 192.168.30.21/26"]
     end
@@ -36,9 +40,6 @@ graph TD
     FRR1 ---|".5 (e1/50) .4<br/>10.100.1.4/31"| SRL2
     FRR2 ---|".7 (e1/51) .6<br/>10.100.1.6/31"| SRL1
     FRR2 ---|".9 (e1/51) .8<br/>10.100.1.8/31"| SRL2
-
-    %% Inter-ToR Peering (iBGP EVPN + Underlay)
-    SRL1 <==>|"<b>e1/49: 10.100.1.0/31 <-> .1/31</b><br/>iBGP TOR-EVPN & VXLAN Tunnel<br/>(VNI 20, 30, 1001)"| SRL2
 
     %% Downlink to Clients
     SRL1 ---|"e1/1.20<br/>VLAN 20"| C1
