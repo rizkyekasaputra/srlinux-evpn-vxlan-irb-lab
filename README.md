@@ -123,6 +123,10 @@ kubectl exec deploy/srl1 -- sr_cli "ping -c 3 10.100.0.2 network-instance defaul
 # Check learned ARP and EVPN MAC/IP entries
 kubectl exec deploy/srl1 -- sr_cli "show arpnd arp-entries"
 kubectl exec deploy/srl1 -- sr_cli "show network-instance mac-vrf-x bridge-table mac-table all"
+
+Check the Layer 3 route table in ip-vrf-red (to verify symmetric IRB)
+kubectl exec deploy/srl1 -- sr_cli "show network-instance ip-vrf-red route-table ipv4-unicast summary"
+
 ```
 
 ### 2. Data Plane End-to-End Connectivity (`client1` -> `client2`)
