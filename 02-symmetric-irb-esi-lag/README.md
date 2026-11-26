@@ -11,20 +11,25 @@ flowchart TB
         C2["<b>client2</b><br/>bond0 (balance-xor, layer3+4)<br/>bond0.30 (VLAN 30)<br/>192.168.30.21/26<br/>via 192.168.30.1"]
     end
 
-    subgraph Fabric["Nokia SR Linux Fabric (AS 65001)"]
-        subgraph SRL1["srl1 (System/LO: 10.100.0.1/32)"]
+    subgraph Leaves["Leaf Switches — Nokia SR Linux (AS 65001)"]
+        subgraph SRL1["srl1 (RID: 10.100.0.1)"]
             S1_LAG1["lag1 (eth-1/1, eth-1/2)<br/>LACP | ES-CLIENT1 (all-active)<br/>ESI: 00:11:11:11:11:11:11:11:11:01<br/>lag1.20 -> mac-vrf-x (VNI 20)"]
             S1_LAG2["lag2 (eth-1/1, eth-1/2)<br/>LACP | ES-CLIENT2 (all-active)<br/>ESI: 00:22:22:22:22:22:22:22:22:02<br/>lag2.30 -> mac-vrf-y (VNI 30)"]
             S1_VRF["ip-vrf-red (VNI/EVI 1001)<br/>vxlan1.1001<br/>irb0.1: 192.168.20.1/26<br/>irb0.2: 192.168.30.1/26"]
-            S1_DEF["default NI<br/>eth-1/49..51 | BGP EVPN"]
+            S1_DEF["default NI (AS 65001)<br/>TOR-EVPN (10.100.1.1)<br/>L3-BGP-RIF (10.100.1.3, 10.100.1.7)"]
         end
 
-        subgraph SRL2["srl2 (System/LO: 10.100.0.2/32)"]
+        subgraph SRL2["srl2 (AS 65001)"]
             S2_LAG1["lag1 (eth-1/1, eth-1/2)<br/>LACP | ES-CLIENT1 (all-active)<br/>ESI: 00:11:11:11:11:11:11:11:11:01<br/>lag1.20 -> mac-vrf-x (VNI 20)"]
             S2_LAG2["lag2 (eth-1/1, eth-1/2)<br/>LACP | ES-CLIENT2 (all-active)<br/>ESI: 00:22:22:22:22:22:22:22:22:02<br/>lag2.30 -> mac-vrf-y (VNI 30)"]
             S2_VRF["ip-vrf-red (VNI/EVI 1001)<br/>vxlan1.1001<br/>irb0.1: 192.168.20.1/26<br/>irb0.2: 192.168.30.1/26"]
-            S2_DEF["default NI<br/>eth-1/49..51 | BGP EVPN"]
+            S2_DEF["default NI (AS 65001)<br/>TOR-EVPN + L3-BGP-RIF"]
         end
+    end
+
+    subgraph Spines["Underlay / Routed Transit — FRRouting"]
+        FRR1["<b>frr1</b><br/>AS 65011 | RID: 10.100.255.1<br/>eBGP: 10.100.1.2, 10.100.1.4"]
+        FRR2["<b>frr2</b><br/>AS 65012 | RID: 10.100.255.2<br/>eBGP: 10.100.1.6, 10.100.1.8"]
     end
 
     C1 ---|"eth1, eth2 (VLAN 20)"| S1_LAG1
@@ -38,7 +43,12 @@ flowchart TB
     S2_LAG1 <--> S2_VRF
     S2_LAG2 <--> S2_VRF
 
-    S1_DEF <==>|"Underlay & BGP EVPN<br/>(VXLAN VNI 20, 30, 1001)"| S2_DEF
+    S1_DEF <-->|"L3-BGP-RIF (eBGP IPv4)"| FRR1
+    S1_DEF <-->|"L3-BGP-RIF (eBGP IPv4)"| FRR2
+    S2_DEF <-->|"L3-BGP-RIF (eBGP IPv4)"| FRR1
+    S2_DEF <-->|"L3-BGP-RIF (eBGP IPv4)"| FRR2
+
+    S1_DEF <==>|"TOR-EVPN (iBGP EVPN/IPv4)<br/>& VXLAN (VNI 20, 30, 1001)"| S2_DEF
 ```
 
 ### Perangkat & Interface
