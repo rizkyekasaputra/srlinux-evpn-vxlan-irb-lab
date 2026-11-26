@@ -1,0 +1,94 @@
+apiVersion: c9s.run/v1alpha1
+kind: Topology
+metadata:
+  name: srl-tor-evpn
+  namespace: default
+spec:
+  definition:
+    containerlab: |
+      name: srl-tor-evpn
+      topology:
+        nodes:
+          frr1:
+            kind: linux
+            image: quay.io/frrouting/frr:9.1.0
+            cmd: sh -c "sed -i 's/bgpd=no/bgpd=yes/g' /etc/frr/daemons && /usr/lib/frr/frrinit.sh start && tail -f /dev/null"
+
+          frr2:
+            kind: linux
+            image: quay.io/frrouting/frr:9.1.0
+            cmd: sh -c "sed -i 's/bgpd=no/bgpd=yes/g' /etc/frr/daemons && /usr/lib/frr/frrinit.sh start && tail -f /dev/null"
+
+          srl1:
+            kind: nokia_srlinux
+            image: ghcr.io/nokia/srlinux:23.10.1
+
+          srl2:
+            kind: nokia_srlinux
+            image: ghcr.io/nokia/srlinux:23.10.1
+
+          client1:
+            kind: linux
+            image: ghcr.io/srl-labs/alpine
+
+          client2:
+            kind: linux
+            image: ghcr.io/srl-labs/alpine
+
+        links:
+          # TOR-1 <-> TOR-2 (EVPN / MLAG-style peer link)
+          - endpoints: ["srl1:e1-49", "srl2:e1-49"]
+
+          # L3 BGP ke frr1 (RIF-1) & frr2 (RIF-2)
+          - endpoints: ["srl1:e1-50", "frr1:eth1"]
+          - endpoints: ["srl2:e1-50", "frr1:eth2"]
+          - endpoints: ["srl1:e1-51", "frr2:eth1"]
+          - endpoints: ["srl2:e1-51", "frr2:eth2"]
+
+          # Multi-homed links (ES-1 & ES-2) ke HOST-1 (client1) & HOST-2 (client2)
+          - endpoints: ["client1:eth1", "srl1:e1-1"]
+          - endpoints: ["client1:eth2", "srl2:e1-1"]
+          - endpoints: ["client2:eth1", "srl1:e1-2"]
+          - endpoints: ["client2:eth2", "srl2:e1-2"]
+
+  deployment:
+    resources:
+      frr1:
+        requests:
+          cpu: "250m"
+          memory: "256Mi"
+        limits:
+          cpu: "500m"
+          memory: "512Mi"
+      frr2:
+        requests:
+          cpu: "250m"
+          memory: "256Mi"
+        limits:
+          cpu: "500m"
+          memory: "512Mi"
+      srl1:
+        requests:
+          cpu: "1"
+          memory: "2Gi"
+        limits:
+          cpu: "2"
+          memory: "4Gi"
+      srl2:
+        requests:
+          cpu: "1"
+          memory: "2Gi"
+        limits:
+          cpu: "2"
+          memory: "4Gi"
+      client1:
+        requests:
+          cpu: "100m"
+          memory: "128Mi"
+      client2:
+        requests:
+          cpu: "100m"
+          memory: "128Mi"
+
+  statusProbes:
+    enabled: false
