@@ -1,6 +1,6 @@
 # 02 - Symmetric IRB with ESI-LAG (Nokia SR Linux + Clabernetes)
 
-Lab ini mengimplementasikan arsitektur **L3 VXLAN EVPN Symmetric Integrated Routing and Bridging (IRB)** dengan multihoming **ESI-LAG** pada dua *switch* Nokia SR Linux (`srl1` dan `srl2`) yang terhubung ke dua *client* Linux (`client1` dan `client2`) di Clabernetes.
+Lab ini mengimplementasikan arsitektur L3 VXLAN EVPN Symmetric IRB dengan multihoming ESI-LAG (all-active) pada dua switch Nokia SR Linux (srl1 dan srl2) yang terhubung ke dua client Linux (client1 dan client2) di Clabernetes. Sesi control plane EVPN (TOR-EVPN) berjalan antar leaf SR Linux, sementara konektivitas underlay IPv4 (L3-BGP-RIF) di-peering-kan dengan node FRR (frr1 dan frr2).
 
 ## Topologi & Pemetaan Jaringan
 
