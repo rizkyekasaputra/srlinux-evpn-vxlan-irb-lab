@@ -4,6 +4,41 @@ Lab ini mengimplementasikan arsitektur **L3 VXLAN EVPN Symmetric Integrated Rout
 
 ## Topologi & Pemetaan Jaringan
 
+flowchart TB
+    subgraph Clients["Linux Clients (Clabernetes)"]
+        C1["<b>client1</b><br/>bond0 (balance-xor, layer3+4)<br/>bond0.20 (VLAN 20)<br/>192.168.20.11/26<br/>via 192.168.20.1"]
+        C2["<b>client2</b><br/>bond0 (balance-xor, layer3+4)<br/>bond0.30 (VLAN 30)<br/>192.168.30.21/26<br/>via 192.168.30.1"]
+    end
+
+    subgraph Fabric["Nokia SR Linux Fabric (AS 65001)"]
+        subgraph SRL1["srl1 (System/LO: 10.100.0.1/32)"]
+            S1_LAG1["lag1 (eth-1/1, eth-1/2)<br/>LACP | ES-CLIENT1 (all-active)<br/>ESI: 00:11:11:11:11:11:11:11:11:01<br/>lag1.20 -> mac-vrf-x (VNI 20)"]
+            S1_LAG2["lag2 (eth-1/1, eth-1/2)<br/>LACP | ES-CLIENT2 (all-active)<br/>ESI: 00:22:22:22:22:22:22:22:22:02<br/>lag2.30 -> mac-vrf-y (VNI 30)"]
+            S1_VRF["ip-vrf-red (VNI/EVI 1001)<br/>vxlan1.1001<br/>irb0.1: 192.168.20.1/26<br/>irb0.2: 192.168.30.1/26"]
+            S1_DEF["default NI<br/>eth-1/49..51 | BGP EVPN"]
+        end
+
+        subgraph SRL2["srl2 (System/LO: 10.100.0.2/32)"]
+            S2_LAG1["lag1 (eth-1/1, eth-1/2)<br/>LACP | ES-CLIENT1 (all-active)<br/>ESI: 00:11:11:11:11:11:11:11:11:01<br/>lag1.20 -> mac-vrf-x (VNI 20)"]
+            S2_LAG2["lag2 (eth-1/1, eth-1/2)<br/>LACP | ES-CLIENT2 (all-active)<br/>ESI: 00:22:22:22:22:22:22:22:22:02<br/>lag2.30 -> mac-vrf-y (VNI 30)"]
+            S2_VRF["ip-vrf-red (VNI/EVI 1001)<br/>vxlan1.1001<br/>irb0.1: 192.168.20.1/26<br/>irb0.2: 192.168.30.1/26"]
+            S2_DEF["default NI<br/>eth-1/49..51 | BGP EVPN"]
+        end
+    end
+
+    C1 ---|"eth1, eth2 (VLAN 20)"| S1_LAG1
+    C1 ---|"eth1, eth2 (VLAN 20)"| S2_LAG1
+
+    C2 ---|"eth1, eth2 (VLAN 30)"| S1_LAG2
+    C2 ---|"eth1, eth2 (VLAN 30)"| S2_LAG2
+
+    S1_LAG1 <--> S1_VRF
+    S1_LAG2 <--> S1_VRF
+    S2_LAG1 <--> S2_VRF
+    S2_LAG2 <--> S2_VRF
+
+    S1_DEF <==>|"Underlay & BGP EVPN<br/>(VXLAN VNI 20, 30, 1001)"| S2_DEF
+
 ### Perangkat & Interface
 * **Switches:** `srl1` (`10.100.0.1/32` loopback/system) dan `srl2` (`10.100.0.2/32` loopback/system)
 * **Switch LAG & ESI:**
