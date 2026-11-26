@@ -23,7 +23,7 @@ flowchart TB
             S2_LAG1["lag1 (eth-1/1, eth-1/2)<br/>LACP | ES-CLIENT1 (all-active)<br/>ESI: 00:11:11:11:11:11:11:11:11:01<br/>lag1.20 -> mac-vrf-x (VNI 20)"]
             S2_LAG2["lag2 (eth-1/1, eth-1/2)<br/>LACP | ES-CLIENT2 (all-active)<br/>ESI: 00:22:22:22:22:22:22:22:22:02<br/>lag2.30 -> mac-vrf-y (VNI 30)"]
             S2_VRF["ip-vrf-red (VNI/EVI 1001)<br/>vxlan1.1001<br/>irb0.1: 192.168.20.1/26<br/>irb0.2: 192.168.30.1/26"]
-            S2_DEF["default NI (AS 65001)<br/>TOR-EVPN + L3-BGP-RIF"]
+            S2_DEF["default NI (AS 65001)<br/>TOR-EVPN<br/>L3-BGP-RIF"]
         end
     end
 
