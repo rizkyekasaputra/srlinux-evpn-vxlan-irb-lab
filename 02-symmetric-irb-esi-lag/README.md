@@ -3,7 +3,7 @@
 Lab ini mengimplementasikan arsitektur **L3 VXLAN EVPN Symmetric Integrated Routing and Bridging (IRB)** dengan multihoming **ESI-LAG** pada dua *switch* Nokia SR Linux (`srl1` dan `srl2`) yang terhubung ke dua *client* Linux (`client1` dan `client2`) di Clabernetes.
 
 ## Topologi & Pemetaan Jaringan
-
+```mermaid
 flowchart TB
     subgraph Clients["Linux Clients (Clabernetes)"]
         C1["<b>client1</b><br/>bond0 (balance-xor, layer3+4)<br/>bond0.20 (VLAN 20)<br/>192.168.20.11/26<br/>via 192.168.20.1"]
